@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>Image Editor Icon</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#20C997" x="0" y="0" width="48" height="48" rx="8"></rect>
+        <g transform="translate(12.000000, 12.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <path d="M22,0 L2,0 C0.9,0 0,0.9 0,2 L0,22 C0,23.1 0.9,24 2,24 L22,24 C23.1,24 24,23.1 24,22 L24,2 C24,0.9 23.1,0 22,0 Z M22,22 L2,22 L2,2 L22,2 L22,22 Z"></path>
+            <circle cx="8.5" cy="8.5" r="2.5"></circle>
+            <path d="M5,19 L19,19 L19,13 L15.5,9.5 C15.22,9.22 14.78,9.22 14.5,9.5 L10,14 L7.5,11.5 C7.22,11.22 6.78,11.22 6.5,11.5 L5,13 L5,19 Z"></path>
+        </g>
+    </g>
+</svg>

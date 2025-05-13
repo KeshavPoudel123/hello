@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>Notepad Icon</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#4A6CF7" x="0" y="0" width="48" height="48" rx="8"></rect>
+        <g transform="translate(12.000000, 8.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <path d="M22,0 L2,0 C0.9,0 0,0.9 0,2 L0,30 C0,31.1 0.9,32 2,32 L22,32 C23.1,32 24,31.1 24,30 L24,2 C24,0.9 23.1,0 22,0 Z M22,30 L2,30 L2,2 L22,2 L22,30 Z"></path>
+            <rect x="4" y="8" width="16" height="2" rx="1"></rect>
+            <rect x="4" y="14" width="16" height="2" rx="1"></rect>
+            <rect x="4" y="20" width="10" height="2" rx="1"></rect>
+        </g>
+    </g>
+</svg>
