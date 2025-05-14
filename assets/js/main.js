@@ -1,774 +1,1310 @@
-/**
- * Latest Online Tools - Main JavaScript
- * Handles dynamic content, mobile menu, and form validation
- */
+// Preloader removed for production
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Update copyright year
-    updateCopyrightYear();
+// ===== NAVIGATION MENU =====
+document.addEventListener('DOMContentLoaded', () => {
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    // Header element is defined but not used
+    // const header = document.querySelector('.header');
+    const searchContainer = document.querySelector('.search-container');
 
-    // Initialize mobile menu
-    initMobileMenu();
+    // Set active class on navigation menu items
+    setActiveNavItem();
 
-    // Populate latest tools
-    populateLatestTools();
+    if (navToggle) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            navToggle.querySelector('.material-icons').textContent =
+                navMenu.classList.contains('active') ? 'close' : 'menu';
 
-    // Initialize newsletter form
-    initNewsletterForm();
+            // Hide search container when menu is opened
+            if (searchContainer && searchContainer.classList.contains('active')) {
+                searchContainer.classList.remove('active');
+            }
+        });
+    }
+
+    // Function to set active class on navigation menu items based on current URL
+    function setActiveNavItem() {
+        try {
+            const currentPath = window.location.pathname.toLowerCase();
+            const navLinks = document.querySelectorAll('.nav-menu a');
+
+            if (!navLinks || navLinks.length === 0) return;
+
+            // First, remove active class from all nav links
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Set only one active link based on current path
+            let activeSet = false;
+
+            // Check if we're on the home page
+            if (!currentPath.includes('/tools/') &&
+                (currentPath.endsWith('index.html') ||
+                 currentPath.endsWith('/') ||
+                 currentPath.split('/').pop() === '')) {
+
+                // Find the Home link
+                const homeLink = document.querySelector('.nav-menu a[href="index.html"]');
+                if (homeLink) {
+                    homeLink.classList.add('active');
+                    activeSet = true;
+                }
+            }
+            // Check if we're on the popular tools page
+            else if (currentPath.includes('/popular-tools/')) {
+                // Find the Popular Tools link
+                const popularToolsLink = document.querySelector('.nav-menu a[href*="popular-tools"]');
+                if (popularToolsLink) {
+                    popularToolsLink.classList.add('active');
+                    activeSet = true;
+                }
+            }
+            // Check if we're on the all tools page
+            else if (currentPath.includes('/all-tools/')) {
+                // Find the All Tools link
+                const allToolsLink = document.querySelector('.nav-menu a[href*="all-tools"]');
+                if (allToolsLink) {
+                    allToolsLink.classList.add('active');
+                    activeSet = true;
+                }
+            }
+
+            // If no active link was set, try a position-based approach as a last resort
+            if (!activeSet) {
+                if (currentPath.includes('/popular-tools/')) {
+                    // Popular Tools is typically the second item
+                    const navItems = document.querySelectorAll('.nav-menu li');
+                    if (navItems && navItems.length > 1) {
+                        const link = navItems[1].querySelector('a');
+                        if (link) {
+                            link.classList.add('active');
+                        }
+                    }
+                } else if (currentPath.includes('/all-tools/')) {
+                    // All Tools is typically the third item
+                    const navItems = document.querySelectorAll('.nav-menu li');
+                    if (navItems && navItems.length > 2) {
+                        const link = navItems[2].querySelector('a');
+                        if (link) {
+                            link.classList.add('active');
+                        }
+                    }
+                } else if (!currentPath.includes('/tools/')) {
+                    // Home is typically the first item
+                    const navItems = document.querySelectorAll('.nav-menu li');
+                    if (navItems && navItems.length > 0) {
+                        const link = navItems[0].querySelector('a');
+                        if (link) {
+                            link.classList.add('active');
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error setting active nav item:', error);
+        }
+    }
+
+    // Handle mobile search button click
+    const mobileSearchBtn = document.querySelector('.mobile-search-btn');
+    if (mobileSearchBtn && searchContainer) {
+        mobileSearchBtn.addEventListener('click', () => {
+            searchContainer.classList.toggle('active');
+
+            // Hide nav menu when search is opened
+            if (navMenu && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                if (navToggle) {
+                    navToggle.querySelector('.material-icons').textContent = 'menu';
+                }
+            }
+        });
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (navMenu && !e.target.closest('.nav') && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            if (navToggle) {
+                navToggle.querySelector('.material-icons').textContent = 'menu';
+            }
+        }
+
+        // Close search container when clicking outside
+        if (searchContainer &&
+            searchContainer.classList.contains('active') &&
+            !e.target.closest('.search-container') &&
+            !e.target.closest('.mobile-search-btn')) {
+            searchContainer.classList.remove('active');
+        }
+    });
 });
 
-/**
- * Updates the copyright year in the footer
- */
-function updateCopyrightYear() {
-    const yearElement = document.getElementById('current-year');
-    if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-    }
-}
+// ===== SCROLL ANIMATIONS =====
+document.addEventListener('DOMContentLoaded', () => {
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
 
-/**
- * Initializes the mobile menu toggle functionality and search toggle
- */
-function initMobileMenu() {
-    const menuToggle = document.querySelector('.mobile-menu-toggle');
-    const mainNavContainer = document.querySelector('.main-nav');
-    const mainNav = document.querySelector('.main-nav ul');
-    const searchToggle = document.getElementById('search-toggle');
-    const mobileSearch = document.querySelector('.mobile-search');
+    const animateOnScroll = () => {
+        animateElements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
 
-    // Create close button for mobile menu
-    if (mainNav && window.innerWidth <= 767) {
-        // Remove existing close button if it exists
-        const existingCloseButton = mainNav.querySelector('.mobile-menu-close');
-        if (existingCloseButton) {
-            existingCloseButton.remove();
-        }
-
-        const closeButton = document.createElement('div');
-        closeButton.className = 'mobile-menu-close';
-        closeButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-        closeButton.style.display = 'flex';
-        closeButton.style.alignItems = 'center';
-        closeButton.style.justifyContent = 'center';
-        closeButton.style.cursor = 'pointer';
-        closeButton.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.2)';
-
-        // Append to the mobile menu instead of body
-        mainNav.appendChild(closeButton);
-
-        // Add event listener to close button
-        closeButton.addEventListener('click', function() {
-            mainNavContainer.classList.remove('active');
-            mainNav.classList.remove('show');
-            if (menuToggle) menuToggle.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-
-    // Mobile menu toggle
-    if (menuToggle && mainNav) {
-        menuToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            mainNavContainer.classList.toggle('active');
-            mainNav.classList.toggle('show');
-            menuToggle.classList.toggle('active');
-
-            // Prevent body scrolling when menu is open
-            if (mainNav.classList.contains('show')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-
-            // Hide search when menu is toggled
-            if (mobileSearch && mobileSearch.classList.contains('show')) {
-                mobileSearch.classList.remove('show');
+            if (elementTop < windowHeight * 0.9) {
+                element.classList.add('visible');
             }
         });
-    }
+    };
 
-    // Search toggle for mobile
-    if (searchToggle && mobileSearch) {
-        searchToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            mobileSearch.classList.toggle('show');
+    // Initial check
+    animateOnScroll();
 
-            // Focus the search input when shown
-            if (mobileSearch.classList.contains('show')) {
-                // Hide the search icon when search is open
-                searchToggle.style.display = 'none';
+    // Check on scroll
+    window.addEventListener('scroll', animateOnScroll);
+});
 
-                // Position the search box below the header
-                const header = document.querySelector('.site-header');
-                if (header) {
-                    const headerHeight = header.offsetHeight;
-                    mobileSearch.style.top = headerHeight + 'px';
-                }
+// ===== CUSTOM CURSOR =====
+document.addEventListener('DOMContentLoaded', () => {
+    const cursor = document.querySelector('.custom-cursor');
 
-                const searchInput = mobileSearch.querySelector('.search-box');
-                if (searchInput) {
-                    searchInput.focus();
-                }
+    // Only enable custom cursor on desktop
+    if (window.innerWidth > 768) {
+        cursor.style.display = 'block';
 
-                // Hide menu if it's open
-                if (mainNav.classList.contains('show')) {
-                    mainNavContainer.classList.remove('active');
-                    mainNav.classList.remove('show');
-                    menuToggle.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            } else {
-                // Show the search icon when search is closed
-                searchToggle.style.display = 'flex';
-            }
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
         });
-    }
 
-    // Close menu when clicking on the overlay
-    mainNavContainer && mainNavContainer.addEventListener('click', function(e) {
-        if (e.target === mainNavContainer) {
-            mainNavContainer.classList.remove('active');
-            mainNav.classList.remove('show');
-            if (menuToggle) menuToggle.classList.remove('active');
-            document.body.style.overflow = '';
+        // Cursor effects on interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, input, .tool-card, .blog-card');
 
-            // Hide close button
-            const closeButton = document.querySelector('.mobile-menu-close');
-            if (closeButton) {
-                closeButton.style.display = 'none';
-            }
-        }
-    });
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.style.width = '40px';
+                cursor.style.height = '40px';
+                cursor.style.background = 'rgba(193, 46, 97, 0.3)';
+            });
 
-    // Close menu and search when clicking outside
-    document.addEventListener('click', function(event) {
-        const isClickInsideNav = mainNav && (mainNav.contains(event.target) || (menuToggle && menuToggle.contains(event.target)));
-        const isClickInsideSearch = mobileSearch && (mobileSearch.contains(event.target) || (searchToggle && searchToggle.contains(event.target)));
-
-        if (!isClickInsideNav && mainNav && mainNav.classList.contains('show')) {
-            mainNavContainer.classList.remove('active');
-            mainNav.classList.remove('show');
-            if (menuToggle) menuToggle.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        if (!isClickInsideSearch && mobileSearch && mobileSearch.classList.contains('show')) {
-            mobileSearch.classList.remove('show');
-            // Show the search icon again when search is closed by clicking outside
-            if (searchToggle) {
-                searchToggle.style.display = 'flex';
-            }
-        }
-    });
-
-    // Add mobile dropdown functionality
-    function setupMobileDropdowns() {
-        if (window.innerWidth <= 767) {
-            const navItems = document.querySelectorAll('.main-nav ul li');
-
-            // Load tools data for mobile menu
-            fetch('data/tools.json')
-                .then(response => response.json())
-                .then(data => {
-                    // First, hide all dropdown menus by default
-                    navItems.forEach(item => {
-                        const dropdown = item.querySelector('.dropdown-menu');
-                        if (dropdown) {
-                            dropdown.style.display = 'none';
-
-                            // If this is the "All Tools" or "Popular Tools" dropdown, populate it with all tools
-                            const link = item.querySelector('a');
-                            if (link && (link.textContent.includes('All Tools') || link.textContent.includes('Popular Tools'))) {
-                                // Clear existing content
-                                dropdown.innerHTML = '';
-
-                                // Create a container for all tools
-                                const allToolsContainer = document.createElement('div');
-                                allToolsContainer.className = 'mobile-all-tools';
-
-                                // Add all categories and tools
-                                data.categories.forEach(category => {
-                                    // Create category heading
-                                    const categoryHeading = document.createElement('h5');
-                                    categoryHeading.textContent = category.name;
-                                    categoryHeading.style.textAlign = 'center';
-                                    categoryHeading.style.margin = '1rem 0 0.5rem';
-                                    categoryHeading.style.borderBottom = '1px solid var(--gray-200)';
-                                    categoryHeading.style.paddingBottom = '0.5rem';
-
-                                    allToolsContainer.appendChild(categoryHeading);
-
-                                    // Add tools for this category
-                                    category.tools.forEach(tool => {
-                                        const toolLink = document.createElement('a');
-                                        toolLink.href = tool.url || '#';
-
-                                        // Create SVG icons with different colors based on category
-                                        let iconColor = '#00C4CC';
-
-                                        if (category.name === 'Image Tools') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#FF5722' : '#FF9800';
-                                        } else if (category.name === 'Developer Tools') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#4CAF50' : '#2196F3';
-                                        } else if (category.name === 'Utility Tools') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#E91E63' : '#9C27B0';
-                                        } else if (category.name === 'Productivity') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#FFC107' : '#03A9F4';
-                                        } else if (category.name === 'Calculators') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#8BC34A' : '#CDDC39';
-                                        } else if (category.name === 'File Tools') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#FF5722' : '#FF9800';
-                                        } else if (category.name === 'Text Tools') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#00C4CC' : '#6A3BE4';
-                                        } else if (category.name === 'Converters') {
-                                            iconColor = category.tools.indexOf(tool) % 2 === 0 ? '#E91E63' : '#9C27B0';
-                                        }
-
-                                        toolLink.innerHTML = `
-                                            <div class="dropdown-tool-icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${iconColor}">
-                                                    <path d="${getSVGPathForTool(tool.icon)}"/>
-                                                </svg>
-                                            </div>
-                                            ${tool.name}
-                                        `;
-
-                                        allToolsContainer.appendChild(toolLink);
-                                    });
-                                });
-
-                                dropdown.appendChild(allToolsContainer);
-                            }
-                        }
-                    });
-
-                    // Set up click handlers for dropdown toggles
-                    navItems.forEach(item => {
-                        const link = item.querySelector('a');
-                        if (link && item.querySelector('.dropdown-menu')) {
-                            // Remove existing event listeners
-                            const newLink = link.cloneNode(true);
-                            link.parentNode.replaceChild(newLink, link);
-
-                            // Add new event listener
-                            newLink.addEventListener('click', function(e) {
-                                // Only prevent default if it has a dropdown
-                                if (item.querySelector('.dropdown-menu')) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-
-                                    // Close any other open dropdowns
-                                    navItems.forEach(otherItem => {
-                                        if (otherItem !== item && otherItem.classList.contains('active')) {
-                                            otherItem.classList.remove('active');
-                                            const otherDropdown = otherItem.querySelector('.dropdown-menu');
-                                            if (otherDropdown) {
-                                                otherDropdown.style.display = 'none';
-                                            }
-                                        }
-                                    });
-
-                                    // Toggle the active class
-                                    item.classList.toggle('active');
-
-                                    // Toggle the dropdown display
-                                    const dropdown = item.querySelector('.dropdown-menu');
-                                    if (dropdown) {
-                                        if (item.classList.contains('active')) {
-                                            dropdown.style.display = 'flex';
-
-                                            // Don't move the text to the right
-                                            const linkText = newLink.textContent.trim();
-                                            newLink.style.transform = 'translateX(0)';
-
-                                            // Scroll to make the dropdown visible if needed
-                                            setTimeout(() => {
-                                                const rect = dropdown.getBoundingClientRect();
-                                                if (rect.bottom > window.innerHeight) {
-                                                    item.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                }
-                                            }, 100);
-                                        } else {
-                                            dropdown.style.display = 'none';
-                                            newLink.style.transform = 'translateX(0)';
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                })
-                .catch(error => console.error('Error loading tools data for mobile menu:', error));
-        }
-    }
-
-    // Helper function to get SVG path for tool icons
-    function getSVGPathForTool(iconName) {
-        const svgPaths = {
-            'edit_note': 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z',
-            'format_list_numbered': 'M3 5H1v16c0 1.1.9 2 2 2h16v-2H3V5zm18-4H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 16H7V3h14v14zM15 5h-2v6h-2v2h2v2h2v-2h2v-2h-2z',
-            'compare_arrows': 'M9.01 14H2v2h7.01v3L13 15l-3.99-4v3zm5.98-1v-3H22V8h-7.01V5L11 9l3.99 4z',
-            'code': 'M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z',
-            'compress': 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z',
-            'picture_as_pdf': 'M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z',
-            'image': 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
-            'palette': 'M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0 1 12 22zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 0 0-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 0 1 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z',
-            'json': 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z',
-            'html': 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
-            'regex': 'M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z',
-            'unit': 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-4v2h4v2h-4v2h4v2H9V7h6v2z',
-            'currency': 'M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z',
-            'url': 'M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16zM2 4.27l3.11 3.11C3.29 8.12 2 9.91 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1 0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4L20 19.74 3.27 3 2 4.27z',
-            'base64': 'M20 5h-9.586L8.707 3.293A.997.997 0 0 0 8 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V7c0-1.103-.897-2-2-2zm-4 9h-3v3h-2v-3H8v-2h3V9h2v3h3v2z',
-            'timer': 'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z',
-            'checklist': 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-            'grade': 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
-            'home': 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
-            'monitor_weight': 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.97 4.06L14.09 11l1.06 4.06 1.23-4.06L17.44 7h1.48l-2.72 10h-1.5l-1.35-5.51L12 17h-1.5L7.78 7h1.48l1.06 4.06L11.55 7h1.48z',
-            'case': 'M5 4v3h5.5v12h3V7H19V4z',
-            'lorem': 'M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h16v2H4v-2z',
-            'format': 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z',
-            'resize': 'M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z',
-            'convert': 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z',
-            'background': 'M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z',
-            'sql': 'M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z',
-            'password': 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z',
-            'qr': 'M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v2h2v-2zm0 4h-2v2h2v-2zm-4-2h-2v2h2v-2zm0 4h-2v2h2v-2zm2-8h2v2h-2v-2zm-4 0h2v2h-2v-2zm4 4h2v2h-2v-2z',
-            'calculator': 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2V9h-2V7h4v10z',
-            'calendar': 'M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z',
-            'note': 'M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z',
-            'tip': 'M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14H7v-2h3v2zm0-4H7v-2h3v2zm0-4H7V7h3v2zm4 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2zm4 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z'
-        };
-
-        return svgPaths[iconName] || 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z';
-    }
-
-    // Call the function initially
-    setupMobileDropdowns();
-
-    // Also call it on window resize
-    window.addEventListener('resize', function() {
-        setupMobileDropdowns();
-    });
-
-    // Handle search form submission for both desktop and mobile
-    const searchForms = document.querySelectorAll('.search-form');
-    if (searchForms.length) {
-        searchForms.forEach(form => {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const searchInput = form.querySelector('.search-box');
-                const searchTerm = searchInput.value.trim();
-
-                if (searchTerm) {
-                    // Implement search functionality here
-                    console.log('Searching for:', searchTerm);
-
-                    // For demo purposes, redirect to all-tools.html with search parameter
-                    window.location.href = `all-tools.html?search=${encodeURIComponent(searchTerm)}`;
-                }
+            element.addEventListener('mouseleave', () => {
+                cursor.style.width = '20px';
+                cursor.style.height = '20px';
+                cursor.style.background = 'rgba(91, 76, 196, 0.3)';
             });
         });
     }
+});
 
-    // Initialize search dropdowns for all pages
-    function initSearchDropdowns() {
-        // Handle desktop search in index.html
-        const desktopSearchInput = document.getElementById('desktop-search-input');
-        const desktopSearchDropdown = document.getElementById('desktop-search-dropdown');
+// ===== SEARCH FUNCTIONALITY =====
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('.search-container .search-box input');
+    const searchResults = document.querySelector('.search-results');
+    const searchBtn = document.querySelector('.search-container .search-btn');
+    const floatingSearchBtn = document.querySelector('.floating-search-btn');
 
-        // Handle desktop search in all-tools.html
-        const desktopSearchInputAll = document.getElementById('desktop-search-input-all');
-        const desktopSearchDropdownAll = document.getElementById('desktop-search-dropdown-all');
+    if (!searchInput || !searchResults) return;
 
-        // Handle desktop search in popular-tools.html
-        const desktopSearchInputPopular = document.getElementById('desktop-search-input-popular');
-        const desktopSearchDropdownPopular = document.getElementById('desktop-search-dropdown-popular');
+    // Determine if we're on the home page or a tool page
+    const isHomePage = !window.location.pathname.includes('/tools/') &&
+                       (window.location.pathname.endsWith('index.html') ||
+                        window.location.pathname.endsWith('/') ||
+                        window.location.pathname.split('/').pop() === '');
 
-        // Handle mobile search in index.html
-        const mobileSearchInput = document.getElementById('mobile-search-input');
-        const mobileSearchDropdown = document.getElementById('mobile-search-dropdown');
+    // Determine if we're on a page in the tools directory
+    const isToolsPage = window.location.pathname.includes('/tools/');
 
-        // Handle mobile search in all-tools.html
-        const mobileSearchInputAll = document.getElementById('mobile-search-input-all');
-        const mobileSearchDropdownAll = document.getElementById('mobile-search-dropdown-all');
+    // Determine if we're on a special page (popular-tools, all-tools)
+    const isSpecialPage = window.location.pathname.includes('/popular-tools/') ||
+                          window.location.pathname.includes('/all-tools/');
 
-        // Handle mobile search in popular-tools.html
-        const mobileSearchInputPopular = document.getElementById('mobile-search-input-popular');
-        const mobileSearchDropdownPopular = document.getElementById('mobile-search-dropdown-popular');
+    // Path is defined but not used directly
+    // const toolsJsonPath = isHomePage ? 'data/tools.json' : '../data/tools.json';
 
-        // Setup desktop search in index.html
-        if (desktopSearchInput && desktopSearchDropdown) {
-            setupSearchDropdown(desktopSearchInput, desktopSearchDropdown);
+    // Global variable to store all tools data
+    let allTools = [];
+
+    // Embedded tools data to avoid CORS issues with local file access
+    const toolsData = {
+        "categories": [
+            {
+                "name": "Text Tools",
+                "icon": "text_format",
+                "tools": [
+                    {
+                        "id": "online-notepad",
+                        "name": "Online Notepad",
+                        "description": "A simple, distraction-free online text editor for quick notes and writing.",
+                        "icon": "edit_note",
+                        "isNew": false,
+                        "url": "tools/onlinenotepad/index.html"
+                    },
+                    {
+                        "id": "word-counter",
+                        "name": "Word Counter",
+                        "description": "Count words, characters, and paragraphs in your text with detailed statistics.",
+                        "icon": "format_list_numbered",
+                        "isNew": false,
+                        "url": "tools/word-counter/index.html"
+                    },
+                    {
+                        "id": "markdown-editor",
+                        "name": "Markdown Editor",
+                        "description": "Write and preview Markdown with syntax highlighting and live preview.",
+                        "icon": "code",
+                        "isNew": true,
+                        "url": "tools/markdown-editor/index.html"
+                    },
+                    {
+                        "id": "lipsum-generator",
+                        "name": "Lorem Ipsum Generator",
+                        "description": "Generate Lorem Ipsum placeholder text for your designs, layouts, and mockups.",
+                        "icon": "format_align_left",
+                        "isNew": true,
+                        "url": "tools/lipsum-generator/index.html"
+                    },
+                    {
+                        "id": "text-diff-checkerer",
+                        "name": "Text Differences Checker",
+                        "description": "Advanced text comparison tool with word-by-word highlighting.",
+                        "icon": "compare",
+                        "isNew": true,
+                        "url": "tools/text-diff-highlighter/index.html"
+                    },
+                    {
+                        "id": "text-case-converter",
+                        "name": "Case Converter",
+                        "description": "Convert text between different cases: uppercase, lowercase, title case, etc.",
+                        "icon": "text_fields",
+                        "isNew": true,
+                        "url": "tools/text-case-converter/index.html"
+                    },
+                    {
+                        "id": "convert-case",
+                        "name": "Convert Case",
+                        "description": "Transform text between various case formats including camelCase, PascalCase, snake_case, and more.",
+                        "icon": "text_fields",
+                        "isNew": true,
+                        "url": "tools/convert-case/index.html"
+                    }
+                ]
+            },
+            {
+                "name": "Developer Tools",
+                "icon": "code",
+                "tools": [
+                    {
+                        "id": "json-formatter",
+                        "name": "JSON Formatter",
+                        "description": "Format, validate, and beautify JSON data.",
+                        "icon": "data_object",
+                        "isNew": false,
+                        "url": "tools/json-formatter/index.html"
+                    },
+                    {
+                        "id": "regex-tester",
+                        "name": "Regex Tester",
+                        "description": "Test and debug regular expressions with real-time highlighting.",
+                        "icon": "find_replace",
+                        "isNew": false,
+                        "url": "tools/regex-tester/index.html"
+                    },
+                    {
+                        "id": "css-grid-generator",
+                        "name": "CSS Grid Generator",
+                        "description": "Create and customize CSS grid layouts with a visual editor.",
+                        "icon": "grid_view",
+                        "isNew": true,
+                        "url": "tools/css-grid-generator/index.html"
+                    },
+                    {
+                        "id": "json-reformatter",
+                        "name": "JSON Reformatter",
+                        "description": "Advanced JSON tool with validation, tree view, and conversion to other formats.",
+                        "icon": "data_object",
+                        "isNew": true,
+                        "url": "tools/json-reformatter/index.html"
+                    },
+                    {
+                        "id": "code-beautifier",
+                        "name": "Code Beautifier",
+                        "description": "Format and beautify code in various programming languages.",
+                        "icon": "format_align_left",
+                        "isNew": true,
+                        "url": "tools/code-beautifier/index.html"
+                    },
+                    {
+                        "id": "html-minifier",
+                        "name": "HTML Minifier",
+                        "description": "Minify HTML code to reduce file size and improve load times.",
+                        "icon": "compress",
+                        "isNew": true,
+                        "url": "tools/html-minifier/index.html"
+                    },
+                    {
+                        "id": "css-minifier",
+                        "name": "CSS Minifier",
+                        "description": "Minify CSS code to reduce file size and improve load times.",
+                        "icon": "compress",
+                        "isNew": true,
+                        "url": "tools/css-minifier/index.html"
+                    },
+                    {
+                        "id": "js-minifier",
+                        "name": "JavaScript Minifier",
+                        "description": "Minify JavaScript code to reduce file size and improve load times.",
+                        "icon": "compress",
+                        "isNew": true,
+                        "url": "tools/js-minifier/index.html"
+                    },
+                    {
+                        "id": "sql-formatter",
+                        "name": "SQL Formatter",
+                        "description": "Format and beautify SQL queries for better readability.",
+                        "icon": "storage",
+                        "isNew": true,
+                        "url": "tools/sql-formatter/index.html"
+                    },
+
+
+                ]
+            },
+            {
+                "name": "Utility Tools",
+                "icon": "build",
+                "tools": [
+                    {
+                        "id": "qr-generator",
+                        "name": "QR Code Generator",
+                        "description": "Create QR codes for URLs, text, contact info, and more.",
+                        "icon": "qr_code",
+                        "isNew": true,
+                        "url": "tools/qr-generator/index.html"
+                    },
+                    {
+                        "id": "unit-converter",
+                        "name": "Unit Converter",
+                        "description": "Convert between different units of measurement.",
+                        "icon": "swap_vert",
+                        "isNew": true,
+                        "url": "tools/unit-converter/index.html"
+                    },
+                    {
+                        "id": "password-generator",
+                        "name": "Password Generator",
+                        "description": "Generate strong, secure passwords with customizable options.",
+                        "icon": "password",
+                        "isNew": true,
+                        "url": "tools/password-generator/index.html"
+                    },
+                    {
+                        "id": "password-checker",
+                        "name": "Password Checker",
+                        "description": "Check password strength and security with breach detection.",
+                        "icon": "security",
+                        "isNew": true,
+                        "url": "tools/password-checker/index.html"
+                    },
+                    {
+                        "id": "ascii-table",
+                        "name": "ASCII Table",
+                        "description": "Reference and search ASCII character codes and symbols.",
+                        "icon": "table_chart",
+                        "isNew": true,
+                        "url": "tools/ascii-table/index.html"
+                    },
+
+                    {
+                        "id": "date-duration-calculator",
+                        "name": "Date Duration Calculator",
+                        "description": "Calculate number of days, weeks, months between dates or add/subtract time from dates.",
+                        "icon": "event",
+                        "isNew": true,
+                        "url": "tools/date-duration-calculator/index.html"
+                    },
+                    {
+                        "id": "whiteboard",
+                        "name": "Whiteboard",
+                        "description": "Collaborative online whiteboard for drawing and brainstorming.",
+                        "icon": "draw",
+                        "isNew": true,
+                        "url": "tools/witeboard/index.html"
+                    },
+
+                ]
+            },
+            {
+                "name": "Math Tools",
+                "icon": "calculate",
+                "tools": [
+                    {
+                        "id": "grade-calculator",
+                        "name": "Grade Calculator",
+                        "description": "Calculate final grades based on assignments, tests, and other assessable items.",
+                        "icon": "school",
+                        "isNew": true,
+                        "url": "tools/grade-calculator/index.html"
+                    },
+                    {
+                        "id": "gpa-calculator",
+                        "name": "GPA Calculator",
+                        "description": "Calculate your Grade Point Average (GPA) based on course grades and credit hours.",
+                        "icon": "calculate",
+                        "isNew": true,
+                        "url": "tools/gpa-calculator/index.html"
+                    },
+
+                ]
+            },
+            {
+                "name": "Image Tools",
+                "icon": "image",
+                "tools": [
+                    {
+                        "id": "img-resizer",
+                        "name": "Image Resizer",
+                        "description": "Resize, crop, and optimize images for web or print.",
+                        "icon": "crop",
+                        "isNew": true,
+                        "url": "tools/img-resizer/index.html"
+                    },
+                    {
+                        "id": "image-compressor",
+                        "name": "Image Compressor",
+                        "description": "Compress images to reduce file size while preserving quality.",
+                        "icon": "compress",
+                        "isNew": true,
+                        "url": "tools/image-compressor/index.html"
+                    },
+                    {
+                        "id": "image-converter",
+                        "name": "Image Converter",
+                        "description": "Convert images between formats like JPG, PNG, WebP, and more.",
+                        "icon": "swap_horiz",
+                        "isNew": true,
+                        "url": "tools/image-converter/index.html"
+                    },
+                    {
+                        "id": "image-editor",
+                        "name": "Image Editor",
+                        "description": "Edit images with filters, effects, and adjustments in your browser.",
+                        "icon": "photo_filter",
+                        "isNew": true,
+                        "url": "tools/image-editor/index.html"
+                    },
+                    {
+                        "id": "image-background-remover",
+                        "name": "Background Remover",
+                        "description": "Remove backgrounds from images automatically with AI technology.",
+                        "icon": "auto_fix_high",
+                        "isNew": true,
+                        "url": "tools/image-background-remover/index.html"
+                    },
+                    {
+                        "id": "meme-generator",
+                        "name": "Meme Generator",
+                        "description": "Create custom memes with your own images and text.",
+                        "icon": "sentiment_very_satisfied",
+                        "isNew": true,
+                        "url": "tools/meme-generator/index.html"
+                    }
+                ]
+            },
+            {
+                "name": "Financial Calculators",
+                "icon": "attach_money",
+                "tools": [
+                    {
+                        "id": "mortgage-calculator",
+                        "name": "Mortgage Calculator",
+                        "description": "Calculate mortgage payments, amortization schedules, and total costs.",
+                        "icon": "home",
+                        "isNew": true,
+                        "url": "tools/mortgage-calculator/index.html"
+                    },
+                    {
+                        "id": "compound-interest-calculator",
+                        "name": "Compound Interest Calculator",
+                        "description": "Calculate growth of investments with compound interest over time.",
+                        "icon": "trending_up",
+                        "isNew": true,
+                        "url": "tools/compound-interest-calculator/index.html"
+                    }
+                ]
+            },
+            {
+                "name": "Health Calculators",
+                "icon": "favorite",
+                "tools": [
+                    {
+                        "id": "bmi-calculator",
+                        "name": "BMI Calculator",
+                        "description": "Calculate Body Mass Index and provide health category information.",
+                        "icon": "monitor_weight",
+                        "isNew": true,
+                        "url": "tools/bmi-calculator/index.html"
+                    }
+                ]
+            },
+            {
+                "name": "File Tools",
+                "icon": "folder",
+                "tools": [
+                    {
+                        "id": "pdf-converter",
+                        "name": "PDF Converter",
+                        "description": "Convert documents to and from PDF format with ease.",
+                        "icon": "picture_as_pdf",
+                        "isNew": true,
+                        "url": "tools/pdf-converter/index.html"
+                    },
+                    {
+                        "id": "file-compressor",
+                        "name": "File Compressor",
+                        "description": "Compress files to reduce size while maintaining quality.",
+                        "icon": "compress",
+                        "isNew": true,
+                        "url": "tools/file-compressor/index.html"
+                    }
+                ]
+            }
+        ]
+    };
+
+    try {
+        // Process the embedded data
+        // Create a flat array of all tools with category information
+        allTools = toolsData.categories.reduce((acc, category) => {
+            return acc.concat(category.tools.map(tool => ({
+                ...tool,
+                category: category.name,
+                categoryIcon: category.icon
+            })));
+        }, []);
+
+        // Add event listeners for search
+        if (searchInput) {
+            searchInput.addEventListener('focus', () => {
+                if (searchResults) {
+                    searchResults.style.display = 'block';
+                    if (searchInput.value.trim().length >= 2) {
+                        performSearch(searchInput.value.trim());
+                    }
+                }
+            });
+
+            searchInput.addEventListener('blur', () => {
+                // Delay hiding to allow for clicking on results
+                if (searchResults) {
+                    setTimeout(() => {
+                        searchResults.style.display = 'none';
+                    }, 200);
+                }
+            });
+
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase().trim();
+                performSearch(query);
+            });
+
+            // Add keyboard event for Enter key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.toLowerCase().trim();
+                    if (query.length >= 2) {
+                        // Redirect to search results page
+                        const searchUrl = isHomePage
+                            ? `tools/search.html?q=${encodeURIComponent(query)}#search-results`
+                            : `../search.html?q=${encodeURIComponent(query)}#search-results`;
+                        window.location.href = searchUrl;
+                    } else if (searchResults) {
+                        performSearch(query);
+                        searchResults.style.display = 'block';
+                    }
+                }
+            });
         }
 
-        // Setup desktop search in all-tools.html
-        if (desktopSearchInputAll && desktopSearchDropdownAll) {
-            setupSearchDropdown(desktopSearchInputAll, desktopSearchDropdownAll);
+        // Add search button click event
+        if (searchBtn && searchInput) {
+            searchBtn.addEventListener('click', () => {
+                const query = searchInput.value.toLowerCase().trim();
+                if (query.length >= 2) {
+                    // Redirect to search results page
+                    const searchUrl = isHomePage
+                        ? `tools/search.html?q=${encodeURIComponent(query)}#search-results`
+                        : `../search.html?q=${encodeURIComponent(query)}#search-results`;
+                    window.location.href = searchUrl;
+                } else if (searchResults) {
+                    performSearch(query);
+                    searchResults.style.display = 'block';
+                }
+            });
         }
 
-        // Setup desktop search in popular-tools.html
-        if (desktopSearchInputPopular && desktopSearchDropdownPopular) {
-            setupSearchDropdown(desktopSearchInputPopular, desktopSearchDropdownPopular);
+        // Initialize related tools if we're on a tool page
+        if (!isHomePage) {
+            initRelatedTools();
         }
-
-        // Setup mobile search in index.html
-        if (mobileSearchInput && mobileSearchDropdown) {
-            setupSearchDropdown(mobileSearchInput, mobileSearchDropdown);
-        }
-
-        // Setup mobile search in all-tools.html
-        if (mobileSearchInputAll && mobileSearchDropdownAll) {
-            setupSearchDropdown(mobileSearchInputAll, mobileSearchDropdownAll);
-        }
-
-        // Setup mobile search in popular-tools.html
-        if (mobileSearchInputPopular && mobileSearchDropdownPopular) {
-            setupSearchDropdown(mobileSearchInputPopular, mobileSearchDropdownPopular);
-        }
+    } catch (error) {
+        console.error('Error processing tools data for search:', error);
     }
 
-    // Helper function to setup search dropdown behavior
-    function setupSearchDropdown(input, dropdown) {
-        // Load tools data
-        let toolsData = [];
-        let categoriesData = [];
+    // Handle the floating search button if it exists
+    if (floatingSearchBtn) {
+        floatingSearchBtn.addEventListener('click', () => {
+            // Get the search term from the search input if it has content
+            const searchTerm = searchInput ? searchInput.value.trim() : '';
 
-        // Fetch tools data from JSON file
-        fetch('data/tools.json')
-            .then(response => response.json())
-            .then(data => {
-                // Store categories
-                categoriesData = data.categories;
+            // Determine the correct search URL based on whether we're on the home page or a tool page
+            const searchUrl = isHomePage
+                ? 'tools/search.html'
+                : '../search.html';
 
-                // Extract all tools into a flat array for easier searching
-                data.categories.forEach(category => {
-                    category.tools.forEach(tool => {
-                        toolsData.push({
-                            ...tool,
-                            category: category.name
-                        });
+            // If there's a search term, include it in the URL
+            if (searchTerm !== '') {
+                window.location.href = `${searchUrl}?q=${encodeURIComponent(searchTerm)}#search-results`;
+            } else {
+                window.location.href = searchUrl;
+            }
+        });
+    }
+
+    // Add functionality for the header search input and button
+    if (searchInput && searchBtn) {
+        // Handle header search button click
+        searchBtn.addEventListener('click', () => {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm !== '') {
+                // Determine the correct search URL based on whether we're on the home page or a tool page
+                const searchUrl = isHomePage
+                    ? 'tools/search.html'
+                    : '../search.html';
+                window.location.href = `${searchUrl}?q=${encodeURIComponent(searchTerm)}#search-results`;
+            }
+        });
+
+        // Handle Enter key press in header search input
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm !== '') {
+                    // Determine the correct search URL based on whether we're on the home page or a tool page
+                    const searchUrl = isHomePage
+                        ? 'tools/search.html'
+                        : '../search.html';
+                    window.location.href = `${searchUrl}?q=${encodeURIComponent(searchTerm)}#search-results`;
+                }
+            }
+        });
+    }
+
+    // Function to perform search
+    function performSearch(query) {
+        if (!searchResults) {
+            console.error("Search results container not found");
+            return;
+        }
+
+        if (!query || query.length < 2) {
+            searchResults.innerHTML = '';
+            searchResults.style.display = 'none';
+            return;
+        }
+
+        try {
+            // Filter tools based on search query (name, description, category, and id)
+            const filteredTools = allTools.filter(tool =>
+                (tool.name && tool.name.toLowerCase().includes(query)) ||
+                (tool.description && tool.description.toLowerCase().includes(query)) ||
+                (tool.category && tool.category.toLowerCase().includes(query)) ||
+                (tool.id && tool.id.toLowerCase().includes(query))
+            );
+
+            // Display search results
+            if (filteredTools.length === 0) {
+                searchResults.innerHTML = `<div class="search-result-empty">No tools found matching "${query}"</div>`;
+            } else {
+                searchResults.innerHTML = filteredTools.map(tool => {
+                    // Ensure tool properties exist with fallbacks
+                    const name = tool.name || 'Unnamed Tool';
+                    const icon = tool.icon || 'build';
+
+                    // Determine the correct URL based on current page location
+                    let toolUrl;
+
+                    // Check if the URL is a placeholder (starts with #)
+                    if (tool.url && tool.url.startsWith('#')) {
+                        // For placeholder URLs, show a modal or alert instead of navigating
+                        toolUrl = '#';
+                    } else if (tool.url) {
+                        // Get the current path to determine what page we're on
+                        const currentPath = window.location.pathname.toLowerCase();
+
+                        // Normalize the tool URL
+                        let normalizedUrl = tool.url;
+
+                        // Determine the correct URL path based on current location
+                        if (isHomePage) {
+                            // On home page, make sure URLs start with "tools/"
+                            if (normalizedUrl.startsWith('../')) {
+                                toolUrl = normalizedUrl.replace('../', 'tools/');
+                            } else if (!normalizedUrl.startsWith('tools/') && !normalizedUrl.startsWith('http')) {
+                                toolUrl = `tools/${normalizedUrl}`;
+                            } else {
+                                toolUrl = normalizedUrl;
+                            }
+                        } else if (currentPath.includes('/tools/')) {
+                            // On any page in the tools directory
+                            if (normalizedUrl.startsWith('tools/')) {
+                                toolUrl = normalizedUrl.replace('tools/', '../');
+                            } else if (!normalizedUrl.startsWith('../') && !normalizedUrl.startsWith('http')) {
+                                toolUrl = `../${normalizedUrl}`;
+                            } else {
+                                toolUrl = normalizedUrl;
+                            }
+                        } else {
+                            // On other pages (about, privacy, etc.)
+                            if (!normalizedUrl.startsWith('tools/') && !normalizedUrl.startsWith('http')) {
+                                toolUrl = `tools/${normalizedUrl}`;
+                            } else {
+                                toolUrl = normalizedUrl;
+                            }
+                        }
+                    } else if (tool.id) {
+                        // If no URL is provided, construct one from the ID
+                        if (isHomePage) {
+                            toolUrl = `tools/${tool.id}/index.html`;
+                        } else if (currentPath.includes('/tools/')) {
+                            toolUrl = `../${tool.id}/index.html`;
+                        } else {
+                            toolUrl = `tools/${tool.id}/index.html`;
+                        }
+                    } else {
+                        toolUrl = '#';
+                    }
+
+                    // No description needed for simplified popup
+
+                    return `
+                        <div class="search-result-item" data-url="${toolUrl}">
+                            <span class="material-icons">${icon}</span>
+                            <div>
+                                <h4>${highlightMatch(name, query)}</h4>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Add click event to search results
+                document.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (item.dataset.url) {
+                            // Get the original URL from the dataset
+                            let fixedUrl = item.dataset.url;
+
+                            // Get the current path to determine what page we're on
+                            const currentPath = window.location.pathname.toLowerCase();
+
+                            // Determine the correct URL path based on current location
+                            if (isHomePage) {
+                                // On home page, make sure URLs start with "tools/"
+                                if (fixedUrl.startsWith('../')) {
+                                    fixedUrl = fixedUrl.replace('../', 'tools/');
+                                } else if (!fixedUrl.startsWith('tools/') && !fixedUrl.startsWith('http')) {
+                                    fixedUrl = `tools/${fixedUrl}`;
+                                }
+                            } else if (currentPath.includes('/tools/')) {
+                                // On any page in the tools directory
+                                if (fixedUrl.startsWith('tools/')) {
+                                    fixedUrl = fixedUrl.replace('tools/', '../');
+                                } else if (!fixedUrl.startsWith('../') && !fixedUrl.startsWith('http')) {
+                                    fixedUrl = `../${fixedUrl}`;
+                                }
+                            } else {
+                                // On other pages (about, privacy, etc.)
+                                if (!fixedUrl.startsWith('tools/') && !fixedUrl.startsWith('http')) {
+                                    fixedUrl = `tools/${fixedUrl}`;
+                                }
+                            }
+
+                            // Navigate directly to the tool
+                            window.location.href = fixedUrl;
+                        }
                     });
                 });
-            })
-            .catch(error => console.error('Error loading tools data:', error));
-
-        input.addEventListener('focus', function() {
-            dropdown.style.display = 'block';
-        });
-
-        input.addEventListener('input', function() {
-            const searchTerm = this.value.trim().toLowerCase();
-            if (searchTerm) {
-                dropdown.style.display = 'block';
-
-                // Filter tools based on search term
-                const matchingTools = toolsData.filter(tool =>
-                    tool.name.toLowerCase().includes(searchTerm) ||
-                    tool.description.toLowerCase().includes(searchTerm) ||
-                    tool.category.toLowerCase().includes(searchTerm)
-                );
-
-                // Get the search results container
-                const searchResultsContainer = dropdown.querySelector('.search-results');
-                if (searchResultsContainer) {
-                    // Clear previous results
-                    searchResultsContainer.innerHTML = '';
-
-                    // Show matching tools (limit to top 5)
-                    const toolsToShow = matchingTools.slice(0, 5);
-
-                    if (toolsToShow.length > 0) {
-                        // Update heading
-                        const heading = dropdown.querySelector('h5');
-                        if (heading) {
-                            heading.textContent = 'Matching Tools';
-                        }
-
-                        // Add matching tools to results
-                        toolsToShow.forEach(tool => {
-                            const resultItem = document.createElement('a');
-                            resultItem.href = tool.url || '#';
-                            resultItem.className = 'search-result-item';
-
-                            resultItem.innerHTML = `
-                                <div class="search-result-icon">
-                                    <img src="assets/images/tool-icons/${tool.icon}.svg" alt="${tool.name} Icon" width="24" height="24">
-                                </div>
-                                <div class="search-result-info">
-                                    <div class="search-result-title">${tool.name} ${tool.isPopular ? '<span class="recommended-label">Popular</span>' : ''}</div>
-                                    <div class="search-result-description">${tool.description}</div>
-                                </div>
-                            `;
-
-                            searchResultsContainer.appendChild(resultItem);
-                        });
-                    } else {
-                        // Show no results message
-                        searchResultsContainer.innerHTML = '<div class="no-results">No matching tools found</div>';
-                    }
-                }
-            } else {
-                // Show default recommended tools
-                dropdown.style.display = 'block';
-
-                // Reset to default view
-                const searchResultsContainer = dropdown.querySelector('.search-results');
-                if (searchResultsContainer) {
-                    // Clear and reset to default content
-                    const heading = dropdown.querySelector('h5');
-                    if (heading) {
-                        heading.textContent = 'Recommended Tools';
-                    }
-
-                    // Show popular tools
-                    const popularTools = toolsData.filter(tool => tool.isPopular);
-                    searchResultsContainer.innerHTML = '';
-
-                    if (popularTools.length > 0) {
-                        popularTools.slice(0, 3).forEach(tool => {
-                            const resultItem = document.createElement('a');
-                            resultItem.href = tool.url || '#';
-                            resultItem.className = 'search-result-item';
-
-                            resultItem.innerHTML = `
-                                <div class="search-result-icon">
-                                    <img src="assets/images/tool-icons/${tool.icon}.svg" alt="${tool.name} Icon" width="24" height="24">
-                                </div>
-                                <div class="search-result-info">
-                                    <div class="search-result-title">${tool.name} <span class="recommended-label">Popular</span></div>
-                                    <div class="search-result-description">${tool.description}</div>
-                                </div>
-                            `;
-
-                            searchResultsContainer.appendChild(resultItem);
-                        });
-                    }
-                }
             }
-        });
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!input.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.style.display = 'none';
-            }
-        });
+            searchResults.style.display = 'block';
+        } catch (error) {
+            console.error("Error in search functionality:", error);
+            searchResults.innerHTML = `<div class="search-result-empty">An error occurred while searching. Please try again.</div>`;
+            searchResults.style.display = 'block';
+        }
     }
 
-    // Initialize search dropdowns
-    initSearchDropdowns();
+    // Function to initialize related tools
+    function initRelatedTools() {
+        try {
+            // Get current tool ID from URL
+            const currentPath = window.location.pathname;
+            if (!currentPath) return;
+
+            const pathParts = currentPath.split('/');
+            if (!pathParts || pathParts.length === 0) return;
+
+            const lastPart = pathParts.pop();
+            if (!lastPart) return;
+
+            const currentToolId = lastPart.replace('.html', '');
+            if (!currentToolId) return;
+
+            // Find the current tool in allTools
+            const currentTool = allTools.find(tool => tool.id === currentToolId);
+
+            if (currentTool && currentTool.relatedTools && currentTool.relatedTools.length > 0) {
+                // Create related tools section
+                const relatedToolsSection = document.createElement('div');
+                relatedToolsSection.className = 'related-tools-section';
+                relatedToolsSection.innerHTML = `
+                    <h3>Related Tools</h3>
+                    <div class="related-tools-container"></div>
+                `;
+
+                // Find the main content area to append the related tools section
+                const mainContent = document.querySelector('.main-content') || document.querySelector('main');
+                if (mainContent) {
+                    mainContent.appendChild(relatedToolsSection);
+
+                    const relatedToolsContainer = relatedToolsSection.querySelector('.related-tools-container');
+                    if (!relatedToolsContainer) return;
+
+                    // Get related tools data
+                    const relatedToolsData = currentTool.relatedTools
+                        .map(id => allTools.find(tool => tool && tool.id === id))
+                        .filter(tool => tool); // Filter out any undefined tools
+
+                    if (relatedToolsData.length === 0) {
+                        // Remove the section if no related tools are found
+                        mainContent.removeChild(relatedToolsSection);
+                        return;
+                    }
+
+                    // Render related tools
+                    relatedToolsData.forEach(tool => {
+                        // Ensure tool properties exist with fallbacks
+                        const name = tool.name || 'Unnamed Tool';
+                        const description = tool.description || 'No description available';
+                        const icon = tool.icon || 'build';
+                        const url = tool.url || '#';
+
+                        const toolCard = document.createElement('div');
+                        toolCard.className = 'related-tool-card';
+                        toolCard.innerHTML = `
+                            <div class="related-tool-icon">
+                                <span class="material-icons">${icon}</span>
+                            </div>
+                            <div class="related-tool-info">
+                                <h4>${name}</h4>
+                                <p>${description.substring(0, 80)}${description.length > 80 ? '...' : ''}</p>
+                                <a href="${url}" class="btn btn-sm">Try it</a>
+                            </div>
+                        `;
+                        relatedToolsContainer.appendChild(toolCard);
+                    });
+                }
+            }
+        } catch (error) {
+            // Error handling
+        }
+    }
+});
+
+// Helper function to highlight matching text in search results
+function highlightMatch(text, query) {
+    if (!text || !query) return text || '';
+
+    try {
+        // Escape special regex characters in the query
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    } catch (error) {
+        return text; // Return original text if there's an error
+    }
 }
 
-/**
- * Populates the latest tools section with dynamic content
- */
-function populateLatestTools() {
-    const latestToolsContainer = document.getElementById('latest-tools-container');
+// ===== LOAD TOOLS FROM JSON =====
+document.addEventListener('DOMContentLoaded', () => {
+    const toolsGrid = document.getElementById('tools-grid');
+    const latestToolsCarousel = document.getElementById('latest-tools-carousel');
 
-    if (!latestToolsContainer) return;
-
-    // Sample data for latest tools
-    // In a real application, this would come from an API or backend
-    const latestTools = [
-        {
-            name: 'Color Palette Generator',
-            description: 'Create beautiful color schemes for your design projects with our AI-powered palette generator.',
-            icon: 'palette',
-            date: 'June 15, 2023'
-        },
-        {
-            name: 'Markdown Editor',
-            description: 'Write and preview Markdown with this intuitive editor featuring syntax highlighting and export options.',
-            icon: 'markdown',
-            date: 'May 28, 2023'
-        },
-        {
-            name: 'JSON Formatter',
-            description: 'Format and validate your JSON data with our easy-to-use tool. Supports minification and beautification.',
-            icon: 'json',
-            date: 'May 12, 2023'
-        },
-        {
-            name: 'URL Shortener',
-            description: 'Create shortened URLs for easier sharing. Includes click tracking and QR code generation.',
-            icon: 'link',
-            date: 'April 30, 2023'
-        },
-        {
-            name: 'Unit Converter',
-            description: 'Convert between different units of measurement including length, weight, volume, and more.',
-            icon: 'convert',
-            date: 'April 15, 2023'
-        }
-    ];
-
-    // Create and append tool items to the container
-    latestTools.forEach(tool => {
-        const toolItem = document.createElement('div');
-        toolItem.className = 'latest-tool-item';
-
-        toolItem.innerHTML = `
-            <div class="tool-header">
-                <div class="tool-icon">
-                    <img src="assets/images/tool-icons/${tool.icon}.svg" alt="${tool.name} Icon" width="32" height="32">
-                </div>
-                <div class="tool-info">
-                    <h3>${tool.name}</h3>
-                    <span class="tool-date">Added on ${tool.date}</span>
-                </div>
+    // Create modal for "under production" message
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'modal-overlay';
+    modalOverlay.innerHTML = `
+        <div class="modal">
+            <button class="modal-close" aria-label="Close modal">
+                <span class="material-icons">close</span>
+            </button>
+            <div class="modal-icon">
+                <span class="material-icons">construction</span>
             </div>
-            <p>${tool.description}</p>
-            <a href="#" class="tool-link">Learn More</a>
-        `;
+            <h3>Tool Under Development</h3>
+            <p>We're working hard to bring this tool to you soon! This feature is currently under development and will be available in the near future.</p>
+            <button class="btn btn-primary">Got it</button>
+        </div>
+    `;
+    document.body.appendChild(modalOverlay);
 
-        latestToolsContainer.appendChild(toolItem);
+    // Modal functionality
+    const closeModal = () => {
+        modalOverlay.classList.remove('active');
+        setTimeout(() => {
+            document.body.style.overflow = 'auto';
+        }, 300);
+    };
+
+    modalOverlay.querySelector('.modal-close').addEventListener('click', closeModal);
+    modalOverlay.querySelector('.btn').addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
     });
 
-    // Add CSS for the dynamically created elements
-    const style = document.createElement('style');
-    style.textContent = `
-        .latest-tool-item {
-            background-color: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+    // Tool click handler
+    const handleToolClick = (e, toolName) => {
+        if (e.target.tagName === 'A' || e.target.closest('a')) {
+            e.preventDefault();
+            document.body.style.overflow = 'hidden';
+            modalOverlay.classList.add('active');
 
-        .latest-tool-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            // Update modal content with tool name
+            const modalTitle = modalOverlay.querySelector('h3');
+            modalTitle.textContent = `${toolName} - Coming Soon`;
         }
+    };
 
-        .tool-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
+    // Fetch tools data
+    fetch('data/tools.json')
+        .then(response => response.json())
+        .then(data => {
+            // Populate tools grid
+            if (toolsGrid) {
+                data.categories.forEach(category => {
+                    // Create category header
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'category-header animate-on-scroll';
+                    categoryHeader.innerHTML = `
+                        <h2 class="category-title">
+                            <span class="material-icons">${category.icon}</span>
+                            ${category.name}
+                        </h2>
+                    `;
+                    toolsGrid.appendChild(categoryHeader);
 
-        .tool-icon {
-            margin-right: 1rem;
-        }
+                    // Create category tools container
+                    const categoryTools = document.createElement('div');
+                    categoryTools.className = 'category-tools';
 
-        .tool-info h3 {
-            margin-bottom: 0.25rem;
-        }
+                    category.tools.forEach(tool => {
+                        const toolCard = document.createElement('div');
+                        toolCard.className = 'tool-card animate-on-scroll';
+                        toolCard.innerHTML = `
+                            <div class="tool-icon">
+                                <span class="material-icons">${tool.icon}</span>
+                            </div>
+                            <h3 class="tool-name">${tool.name}</h3>
+                            <p class="tool-description">${tool.description}</p>
+                            <a href="${tool.url}" class="btn btn-primary">Launch</a>
+                            ${tool.isNew ? '<span class="tool-badge">New</span>' : ''}
+                        `;
 
-        .tool-date {
-            font-size: 0.875rem;
-            color: #6c757d;
-        }
-    `;
-    document.head.appendChild(style);
+                        // Add click event to show "under production" modal
+                        toolCard.addEventListener('click', (e) => handleToolClick(e, tool.name));
+
+                        categoryTools.appendChild(toolCard);
+                    });
+
+                    toolsGrid.appendChild(categoryTools);
+                });
+
+                // Re-trigger animation check
+                document.dispatchEvent(new Event('scroll'));
+            }
+
+            // All tools section is now a simple CTA
+
+            // Populate latest tools carousel
+            if (latestToolsCarousel) {
+                const newTools = data.categories.reduce((acc, category) => {
+                    return acc.concat(category.tools.filter(tool => tool.isNew));
+                }, []);
+
+                newTools.forEach(tool => {
+                    const toolCard = document.createElement('div');
+                    toolCard.className = 'tool-card';
+                    toolCard.innerHTML = `
+                        <div class="tool-icon">
+                            <span class="material-icons">${tool.icon}</span>
+                        </div>
+                        <h3 class="tool-name">${tool.name}</h3>
+                        <p class="tool-description">${tool.description}</p>
+                        <a href="${tool.url}" class="btn btn-primary">Launch</a>
+                        <span class="tool-badge">New</span>
+                    `;
+
+                    // Add click event to show "under production" modal
+                    toolCard.addEventListener('click', (e) => handleToolClick(e, tool.name));
+
+                    latestToolsCarousel.appendChild(toolCard);
+                });
+
+                // Initialize carousel functionality
+                initCarousel();
+            }
+        })
+        .catch(() => { /* Error handling */ });
+});
+
+// ===== CAROUSEL FUNCTIONALITY =====
+function initCarousel() {
+    const carousel = document.getElementById('latest-tools-carousel');
+    const prevBtn = document.querySelector('.carousel-control.prev');
+    const nextBtn = document.querySelector('.carousel-control.next');
+
+    if (!carousel || !prevBtn || !nextBtn) return;
+
+    let scrollAmount = 0;
+    const cardWidth = 300; // Approximate width of a card including margins
+
+    prevBtn.addEventListener('click', () => {
+        scrollAmount = Math.max(scrollAmount - cardWidth, 0);
+        carousel.scrollTo({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+    });
+
+    nextBtn.addEventListener('click', () => {
+        scrollAmount = Math.min(scrollAmount + cardWidth, carousel.scrollWidth - carousel.clientWidth);
+        carousel.scrollTo({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+    });
 }
 
-/**
- * Initializes the newsletter form with validation and submission handling
- */
-function initNewsletterForm() {
+// ===== NEWSLETTER FORM =====
+document.addEventListener('DOMContentLoaded', () => {
     const newsletterForm = document.getElementById('newsletter-form');
+    const formMessage = document.querySelector('.form-message');
 
     if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+        newsletterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-            const emailInput = document.getElementById('email');
-            const email = emailInput.value.trim();
+            const email = document.getElementById('email').value;
 
-            if (!isValidEmail(email)) {
-                showFormError(emailInput, 'Please enter a valid email address');
+            // Simple validation
+            if (!email || !email.includes('@')) {
+                formMessage.textContent = 'Please enter a valid email address.';
+                formMessage.style.color = '#ff4d4d';
                 return;
             }
 
             // Simulate form submission
-            const submitButton = newsletterForm.querySelector('.submit-button');
-            const originalText = submitButton.textContent;
+            formMessage.textContent = 'Subscribing...';
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Subscribing...';
-
-            // Simulate API call with timeout
+            // Simulate API call
             setTimeout(() => {
-                // Reset form
+                formMessage.textContent = 'Thank you for subscribing!';
+                formMessage.style.color = '#4dffa6';
                 newsletterForm.reset();
 
-                // Show success message
-                showFormSuccess('Thank you for subscribing! We\'ve sent a confirmation email.');
-
-                // Reset button
-                submitButton.disabled = false;
-                submitButton.textContent = originalText;
+                // Clear success message after a few seconds
+                setTimeout(() => {
+                    formMessage.textContent = '';
+                }, 3000);
             }, 1500);
         });
     }
-}
+});
 
-/**
- * Validates an email address format
- * @param {string} email - The email address to validate
- * @returns {boolean} - Whether the email is valid
- */
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
+// ===== LOTTIE ANIMATIONS =====
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to create a default animation when JSON files can't be loaded
+    const createDefaultAnimation = (container) => {
+        if (!container) return false;
 
-/**
- * Shows an error message for a form input
- * @param {HTMLElement} input - The input element
- * @param {string} message - The error message
- */
-function showFormError(input, message) {
-    // Remove any existing error message
-    const existingError = input.parentElement.querySelector('.error-message');
-    if (existingError) {
-        existingError.remove();
+        try {
+            // Create a simple animated circle as fallback
+            container.innerHTML = `
+                <div class="default-animation">
+                    <div class="circle circle1"></div>
+                    <div class="circle circle2"></div>
+                    <div class="circle circle3"></div>
+                </div>
+            `;
+            container.style.opacity = '1';
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    // Initialize all animations with CSS-based animations
+    const initAnimations = () => {
+        try {
+            // Hero animation
+            const heroLottieContainer = document.getElementById('hero-lottie');
+            if (heroLottieContainer) {
+                createDefaultAnimation(heroLottieContainer);
+            }
+
+            // Search animation
+            const searchLottieContainer = document.getElementById('search-lottie');
+            if (searchLottieContainer) {
+                searchLottieContainer.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+                        <style>
+                            @keyframes pulse {
+                                0%, 100% { opacity: 0.4; transform: scale(0.95); }
+                                50% { opacity: 1; transform: scale(1.05); }
+                            }
+                            .search-icon {
+                                animation: pulse 3s ease-in-out infinite;
+                                transform-origin: center;
+                                fill: #5B4CC4;
+                            }
+                            .search-circle {
+                                animation: pulse 3s ease-in-out infinite;
+                                transform-origin: center;
+                                fill: none;
+                                stroke: #C12E61;
+                                stroke-width: 5;
+                            }
+                        </style>
+                        <g class="search-group">
+                            <circle class="search-circle" cx="80" cy="80" r="40"></circle>
+                            <path class="search-icon" d="M110,110 L140,140 L130,150 L100,120 Z"></path>
+                        </g>
+                    </svg>
+                `;
+                searchLottieContainer.style.opacity = '1';
+            }
+
+            // Loading animation for preloader
+            const preloaderContainer = document.getElementById('preloader-lottie');
+            if (preloaderContainer) {
+                try {
+                    // Embed lottie1.json animation data directly to avoid CORS issues
+                    const lottie1AnimationData = {"v":"5.7.5","fr":100,"ip":0,"op":406,"w":1080,"h":1080,"nm":"Comp 1","ddd":0,"metadata":{"backgroundColor":{"r":255,"g":255,"b":255}},"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"8 (Group)","sr":1,"ks":{"p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":2},"s":{"a":0,"k":[100,100],"ix":2},"r":{"a":0,"k":0,"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}},"ao":0,"shapes":[{"ty":"gr","it":[{"ty":"gr","it":[{"ty":"gr","nm":"dotR","it":[{"ty":"el","d":1,"s":{"a":0,"k":[71,71],"ix":2},"p":{"a":0,"k":[0,0],"ix":2}},{"ty":"st","c":{"a":0,"k":[0.49019607843137253,0.5137254901960784,0.5607843137254902],"ix":2},"o":{"a":0,"k":100,"ix":2},"w":{"a":0,"k":0,"ix":2},"lc":1,"lj":1,"ml":4},{"ty":"fl","c":{"a":0,"k":[0.3568627450980392,0.2980392156862745,0.7686274509803922],"ix":2},"o":{"a":0,"k":100,"ix":2},"r":1,"bm":0},{"ty":"tr","p":{"a":0,"k":[145,50],"ix":2},"a":{"a":0,"k":[0,0],"ix":2},"s":{"a":0,"k":[100,100],"ix":2},"r":{"a":0,"k":180,"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}}]},{"ty":"gr","nm":"dotL","it":[{"ty":"el","d":1,"s":{"a":0,"k":[90,90],"ix":2},"p":{"a":0,"k":[0,0],"ix":2}},{"ty":"st","c":{"a":0,"k":[0.5568627450980392,0.6196078431372549,0.6745098039215687],"ix":2},"o":{"a":0,"k":100,"ix":2},"w":{"a":0,"k":0,"ix":2},"lc":1,"lj":1,"ml":4},{"ty":"fl","c":{"a":0,"k":[0.3568627450980392,0.2980392156862745,0.7686274509803922],"ix":2},"o":{"a":0,"k":100,"ix":2},"r":1,"bm":0},{"ty":"tr","p":{"a":0,"k":[-25.25,50],"ix":2},"a":{"a":0,"k":[0,0],"ix":2},"s":{"a":0,"k":[100,100],"ix":2},"r":{"a":0,"k":0,"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}}]},{"ty":"tr","p":{"a":0,"k":[-10,0],"ix":2},"a":{"a":0,"k":[50,50],"ix":2},"s":{"a":0,"k":[100,100],"ix":2},"r":{"a":0,"k":0,"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}}]},{"ty":"tr","p":{"a":0,"k":[558,504],"ix":2},"a":{"a":0,"k":[0,0],"ix":2},"s":{"a":0,"k":[180,180],"ix":2},"r":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":[0.75],"y":[0.75]},"o":{"x":[0.25],"y":[0.25]}},{"t":400,"s":[-720],"i":{"x":[0.75],"y":[0.75]},"o":{"x":[0.25],"y":[0.25]}}],"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}}]}],"ip":0,"op":407,"st":0,"bm":0},{"ddd":0,"ind":2,"ty":4,"nm":"8","sr":1,"ks":{"p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":2},"s":{"a":0,"k":[100,100],"ix":2},"r":{"a":0,"k":0,"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}},"ao":0,"shapes":[{"ty":"gr","nm":"8","it":[{"ty":"sh","d":1,"ks":{"a":0,"k":{"c":true,"v":[[0,0],[85.509,85.509],[171.018,0],[85.509,-85.509],[0,0],[-85.509,85.509],[-171.018,0],[-85.509,-85.509],[0,0]],"i":[[0,0],[-47.225,0],[0,47.225],[47.225,0],[0,-47.225],[47.225,0],[0,47.225],[-47.225,0],[0,-47.225]],"o":[[0,47.225],[47.225,0],[0,-47.225],[-47.225,0],[0,47.225],[-47.225,0],[0,-47.225],[47.225,0],[0,0]]}}},{"ty":"tm","s":{"a":0,"k":50,"ix":2},"e":{"a":0,"k":75,"ix":2},"o":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":[0.75],"y":[0.75]},"o":{"x":[0.25],"y":[0.25]}},{"t":400,"s":[720],"i":{"x":[0.75],"y":[0.75]},"o":{"x":[0.25],"y":[0.25]}}],"ix":2},"m":1},{"ty":"st","c":{"a":0,"k":[0.7568627450980392,0.1803921568627451,0.3803921568627451],"ix":2},"o":{"a":0,"k":100,"ix":2},"w":{"a":0,"k":71,"ix":2},"lc":1,"lj":1,"ml":4},{"ty":"tr","p":{"a":0,"k":[558,504],"ix":2},"a":{"a":0,"k":[0,0],"ix":2},"s":{"a":0,"k":[180,180],"ix":2},"r":{"a":1,"k":[{"t":0,"s":[0],"i":{"x":[0.75],"y":[0.75]},"o":{"x":[0.25],"y":[0.25]}},{"t":400,"s":[-720],"i":{"x":[0.75],"y":[0.75]},"o":{"x":[0.25],"y":[0.25]}}],"ix":2},"o":{"a":0,"k":100,"ix":2},"sk":{"a":0,"k":0,"ix":2},"sa":{"a":0,"k":0,"ix":2}}]}],"ip":0,"op":407,"st":0,"bm":0}],"markers":[]};
+
+                    lottie.loadAnimation({
+                        container: preloaderContainer,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        animationData: lottie1AnimationData // Use embedded data instead of path
+                    });
+                    preloaderContainer.style.opacity = '1';
+                } catch (error) {
+                    // Fallback to default animation if Lottie fails
+                    createDefaultAnimation(preloaderContainer);
+                }
+            }
+
+            // Initialize featured tools animations
+            initFeaturedToolsAnimations();
+        } catch (error) {
+            // Error handling
+        }
+    };
+
+    // Initialize featured tools animations
+    const initFeaturedToolsAnimations = () => {
+        try {
+            const featuredToolsAnimations = document.querySelectorAll('.featured-tool-animation');
+            if (featuredToolsAnimations.length > 0) {
+                featuredToolsAnimations.forEach((container, index) => {
+                    if (!container) return;
+
+                    try {
+                        // Use CSS-based animations
+                        container.innerHTML = `
+                            <div class="featured-animation-wrapper animation-style-${(index % 3) + 1}">
+                                <div class="featured-animation-circle"></div>
+                                <div class="featured-animation-shape"></div>
+                            </div>
+                        `;
+                        container.style.opacity = '1';
+                    } catch (error) {
+                        // Error handling
+                    }
+                });
+            }
+
+            // File tools animation
+            const fileToolsAnimation = document.getElementById('file-tools-animation');
+            if (fileToolsAnimation) {
+                fileToolsAnimation.innerHTML = `
+                    <div class="file-tools-animation-wrapper">
+                        <div class="file-icon"></div>
+                        <div class="file-lines">
+                            <div class="file-line line1"></div>
+                            <div class="file-line line2"></div>
+                            <div class="file-line line3"></div>
+                        </div>
+                    </div>
+                `;
+                fileToolsAnimation.style.opacity = '1';
+            }
+        } catch (error) {
+            // Error handling
+        }
+    };
+
+    // Start the initialization process
+    initAnimations();
+});
+
+// ===== STICKY HEADER & FLOATING SEARCH BUTTON =====
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('.header');
+    const floatingSearchBtn = document.querySelector('.floating-search-btn');
+
+    // Initially hide the floating search button
+    if (floatingSearchBtn) {
+        floatingSearchBtn.style.transform = 'translateY(100px)';
+        floatingSearchBtn.style.opacity = '0';
     }
 
-    // Create and append error message
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-message';
-    errorElement.textContent = message;
-    errorElement.style.color = '#dc3545';
-    errorElement.style.fontSize = '0.875rem';
-    errorElement.style.marginTop = '0.5rem';
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-    input.parentElement.appendChild(errorElement);
+        // Handle sticky header
+        if (scrollTop > 50) {
+            header.style.padding = '0.5rem 0';
+            header.style.boxShadow = 'var(--shadow-md)';
+        } else {
+            header.style.padding = 'var(--spacing-sm) 0';
+            header.style.boxShadow = 'var(--shadow-sm)';
+        }
 
-    // Highlight input
-    input.style.borderColor = '#dc3545';
-
-    // Remove error after 3 seconds
-    setTimeout(() => {
-        errorElement.remove();
-        input.style.borderColor = '';
-    }, 3000);
-}
-
-/**
- * Shows a success message after form submission
- * @param {string} message - The success message
- */
-function showFormSuccess(message) {
-    const newsletterForm = document.getElementById('newsletter-form');
-
-    // Create success message element
-    const successElement = document.createElement('div');
-    successElement.className = 'success-message';
-    successElement.textContent = message;
-    successElement.style.color = '#28a745';
-    successElement.style.backgroundColor = '#d4edda';
-    successElement.style.padding = '1rem';
-    successElement.style.borderRadius = '8px';
-    successElement.style.marginTop = '1rem';
-
-    // Insert after form
-    newsletterForm.parentElement.insertBefore(successElement, newsletterForm.nextSibling);
-
-    // Remove success message after 5 seconds
-    setTimeout(() => {
-        successElement.remove();
-    }, 5000);
-}
+        // Handle floating search button visibility
+        if (scrollTop > 300) {
+            // Show floating search button
+            if (floatingSearchBtn) {
+                floatingSearchBtn.style.transform = 'translateY(0)';
+                floatingSearchBtn.style.opacity = '1';
+            }
+        } else {
+            // Hide floating search button
+            if (floatingSearchBtn) {
+                floatingSearchBtn.style.transform = 'translateY(100px)';
+                floatingSearchBtn.style.opacity = '0';
+            }
+        }
+    });
+});
