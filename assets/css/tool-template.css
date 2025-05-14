@@ -1,0 +1,451 @@
+/*
+ * Tool Template Stylesheet
+ * Styles for the common tool template used across all tools
+ */
+
+/* Tool Header Styles */
+.tool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.tool-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tool-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.tool-title h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Share Button Styles */
+.share-button {
+    position: relative;
+}
+
+.share-button button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.share-button button:hover {
+    background-color: var(--gray-100);
+}
+
+.share-button button svg {
+    stroke: var(--primary-color);
+}
+
+.share-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    min-width: 200px;
+    z-index: 100;
+    display: none;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.share-dropdown.show {
+    display: block;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.share-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s ease;
+    color: var(--gray-800);
+    text-decoration: none;
+}
+
+.share-option:hover {
+    background-color: var(--gray-100);
+}
+
+.share-option svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Tool Main Content Styles */
+.tool-main {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    min-height: 300px;
+}
+
+.tool-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-sm);
+    color: var(--gray-600);
+    font-style: italic;
+}
+
+/* Similar Tools Section */
+.similar-tools {
+    margin: 3rem 0;
+}
+
+.similar-tools h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--gray-800);
+}
+
+.similar-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.similar-tool-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.similar-tool-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.similar-tool-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+}
+
+.similar-tool-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--gray-800);
+}
+
+.similar-tool-card p {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+}
+
+.tool-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tool-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+/* About Tool Section */
+.about-tool {
+    margin: 3rem 0;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+}
+
+.about-tool h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--gray-800);
+}
+
+.about-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: var(--gray-700);
+}
+
+/* How to Use Section */
+.how-to-use {
+    margin: 3rem 0;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+}
+
+.how-to-use h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--gray-800);
+}
+
+.steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.step {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--gray-800);
+}
+
+.step-content p {
+    color: var(--gray-700);
+    line-height: 1.6;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    padding: 1.5rem 0;
+    margin-top: 3rem;
+}
+
+.site-footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-logo {
+    width: 24px;
+    height: 24px;
+}
+
+.footer-brand span {
+    font-weight: 600;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.copyright {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+}
+
+.contact a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.contact a:hover {
+    color: var(--primary-dark);
+}
+
+/* Apple-style Notification System */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.notification {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    pointer-events: auto;
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notification-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.notification-message {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    margin: 0;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--gray-500);
+    transition: color 0.2s ease;
+}
+
+.notification-close:hover {
+    color: var(--gray-800);
+}
+
+.notification-success .notification-icon {
+    color: #34C759;
+}
+
+.notification-error .notification-icon {
+    color: #FF3B30;
+}
+
+.notification-info .notification-icon {
+    color: #007AFF;
+}
+
+.notification-warning .notification-icon {
+    color: #FF9500;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .tool-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .share-button {
+        align-self: flex-end;
+    }
+
+    .similar-tools-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .step {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .site-footer .container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .footer-brand {
+        justify-content: center;
+    }
+
+    .notification-container {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .tool-main {
+        padding: 1.5rem;
+    }
+
+    .about-tool, .how-to-use {
+        padding: 1.5rem;
+    }
+
+    .tool-title h1 {
+        font-size: 1.5rem;
+    }
+}

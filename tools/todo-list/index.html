@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Todo List - Free online task management tool with Apple-like UI. Organize your tasks efficiently with no installation required.">
+    <title>Todo List - Latest Online Tools</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/tool-template.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+    <!-- Open Graph tags for social sharing -->
+    <meta property="og:title" content="Todo List - Latest Online Tools">
+    <meta property="og:description" content="Free online task management tool with Apple-like UI. Organize your tasks efficiently with no installation required.">
+    <meta property="og:image" content="../../assets/images/og-image.svg">
+    <meta property="og:url" content="https://latestonlinetools.com/tools/todo-list">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-left">
+                <div class="logo">
+                    <a href="../../index.html">
+                        <img src="../../assets/images/favicon.svg" alt="Latest Online Tools Logo" class="brand-logo">
+                        <span>LatestOnlineTools</span>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li>
+                            <a href="../../popular-tools.html">Popular Tools <span class="dropdown-icon">▾</span></a>
+                            <div class="dropdown-menu dropdown-wide popular-tools-dropdown">
+                                <!-- Popular tools dropdown content will be loaded dynamically -->
+                            </div>
+                        </li>
+                        <li>
+                            <a href="../../all-tools.html">All Tools <span class="dropdown-icon">▾</span></a>
+                            <div class="dropdown-menu dropdown-wide all-tools-dropdown">
+                                <!-- All tools dropdown content will be loaded dynamically -->
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="nav-actions">
+                <div class="desktop-search">
+                    <form action="#" method="get" class="search-form">
+                        <input type="search" class="search-box" id="desktop-search-input" placeholder="Search tools..." aria-label="Search tools">
+                    </form>
+                    <div class="search-dropdown search-dropdown-wide" id="desktop-search-dropdown">
+                        <!-- Search results will be loaded dynamically -->
+                    </div>
+                </div>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div id="search-toggle" class="search-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="mobile-search">
+            <form action="#" method="get" class="search-form">
+                <input type="search" class="search-box" id="mobile-search-input" placeholder="Search tools..." aria-label="Search tools">
+            </form>
+            <div class="search-dropdown" id="mobile-search-dropdown">
+                <!-- Mobile search results will be loaded dynamically -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Tool Content Section -->
+    <main class="tool-content">
+        <div class="container">
+            <!-- Tool Header -->
+            <div class="tool-header">
+                <div class="tool-title">
+                    <img src="../../assets/images/tool-icons/checklist.svg" alt="Todo List Icon" class="tool-icon">
+                    <h1>Todo List</h1>
+                </div>
+                <div class="share-button">
+                    <button id="share-btn" aria-label="Share this tool">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <div class="share-dropdown" id="share-dropdown">
+                        <a href="#" class="share-option" id="share-facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#1877F2">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                            </svg>
+                            Facebook
+                        </a>
+                        <a href="#" class="share-option" id="share-twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#1DA1F2">
+                                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                            </svg>
+                            Twitter
+                        </a>
+                        <a href="#" class="share-option" id="share-linkedin">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#0A66C2">
+                                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                                <rect x="2" y="9" width="4" height="12"></rect>
+                                <circle cx="4" cy="4" r="2"></circle>
+                            </svg>
+                            LinkedIn
+                        </a>
+                        <a href="#" class="share-option" id="share-email">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#EA4335">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Email
+                        </a>
+                        <a href="#" class="share-option" id="copy-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#6A3BE4">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            Copy Link
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Todo List Tool Main Content -->
+            <div class="tool-main todo-app">
+                <div class="todo-header">
+                    <div class="todo-header-left">
+                        <h2>My Tasks</h2>
+                        <span class="task-count" id="task-count">0 tasks</span>
+                    </div>
+                    <div class="todo-header-right">
+                        <button id="add-task-btn" class="add-task-btn" aria-label="Add new task">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="todo-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+                
+                <div class="todo-list" id="todo-list">
+                    <!-- Tasks will be added here dynamically -->
+                    <div class="empty-state" id="empty-state">
+                        <img src="empty-state.svg" alt="No tasks" class="empty-state-icon">
+                        <p>No tasks yet</p>
+                        <p class="empty-state-subtitle">Add a task to get started</p>
+                    </div>
+                </div>
+                
+                <!-- Add Task Modal -->
+                <div class="modal" id="add-task-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>New Task</h3>
+                            <button class="modal-close" id="close-modal">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add-task-form">
+                                <div class="form-group">
+                                    <label for="task-title">Task Title</label>
+                                    <input type="text" id="task-title" placeholder="Enter task title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="task-description">Description (optional)</label>
+                                    <textarea id="task-description" placeholder="Enter task description"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="task-due-date">Due Date (optional)</label>
+                                    <input type="date" id="task-due-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="task-priority">Priority</label>
+                                    <select id="task-priority">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-add-task" class="btn-secondary">Cancel</button>
+                                    <button type="submit" class="btn-primary">Add Task</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit Task Modal -->
+                <div class="modal" id="edit-task-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Edit Task</h3>
+                            <button class="modal-close" id="close-edit-modal">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="edit-task-form">
+                                <input type="hidden" id="edit-task-id">
+                                <div class="form-group">
+                                    <label for="edit-task-title">Task Title</label>
+                                    <input type="text" id="edit-task-title" placeholder="Enter task title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-task-description">Description (optional)</label>
+                                    <textarea id="edit-task-description" placeholder="Enter task description"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-task-due-date">Due Date (optional)</label>
+                                    <input type="date" id="edit-task-due-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-task-priority">Priority</label>
+                                    <select id="edit-task-priority">
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="delete-task" class="btn-danger">Delete</button>
+                                    <div class="right-actions">
+                                        <button type="button" id="cancel-edit-task" class="btn-secondary">Cancel</button>
+                                        <button type="submit" class="btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Tools Section -->
+            <section class="similar-tools">
+                <h2>Similar Tools</h2>
+                <div class="similar-tools-grid">
+                    <div class="similar-tool-card">
+                        <div class="similar-tool-icon">
+                            <img src="../../assets/images/tool-icons/timer.svg" alt="Pomodoro Timer">
+                        </div>
+                        <h3>Pomodoro Timer</h3>
+                        <p>Boost productivity with timed work sessions and breaks.</p>
+                        <a href="../pomodoro-timer/index.html" class="tool-link">Try It</a>
+                    </div>
+                    <div class="similar-tool-card">
+                        <div class="similar-tool-icon">
+                            <img src="../../assets/images/tool-icons/calendar_today.svg" alt="Calendar Planner">
+                        </div>
+                        <h3>Calendar Planner</h3>
+                        <p>Plan your schedule with an intuitive calendar interface.</p>
+                        <a href="../calendar-planner/index.html" class="tool-link">Try It</a>
+                    </div>
+                    <div class="similar-tool-card">
+                        <div class="similar-tool-icon">
+                            <img src="../../assets/images/tool-icons/trending_up.svg" alt="Habit Tracker">
+                        </div>
+                        <h3>Habit Tracker</h3>
+                        <p>Track and build habits with visual progress indicators.</p>
+                        <a href="../habit-tracker/index.html" class="tool-link">Try It</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Tool Section -->
+            <section class="about-tool">
+                <h2>What is Todo List?</h2>
+                <div class="about-content">
+                    <p>Todo List is a free online task management tool designed with an Apple-like UI to help you organize your tasks efficiently. It allows you to create, edit, and track your tasks all in one place, with no installation required.</p>
+                    <p>With its clean and intuitive interface, Todo List makes it easy to manage your daily tasks, set priorities, add due dates, and mark tasks as completed. Your tasks are automatically saved in your browser, so you can access them anytime you return to the tool.</p>
+                    <p>Whether you're managing work projects, personal errands, or study assignments, Todo List helps you stay organized and focused on what matters most. The tool is designed to be simple yet powerful, providing just the right features to manage your tasks without overwhelming you with complexity.</p>
+                </div>
+            </section>
+
+            <!-- How to Use Section -->
+            <section class="how-to-use">
+                <h2>How to Use Todo List</h2>
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Add a New Task</h3>
+                            <p>Click the "+" button in the top right corner to open the Add Task modal. Enter a title for your task, and optionally add a description, due date, and priority level. Click "Add Task" to create your new task.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Manage Your Tasks</h3>
+                            <p>Click the checkbox next to a task to mark it as completed. Use the filter buttons (All, Active, Completed) to view different sets of tasks. Click on any task to view its details or edit it.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Edit or Delete Tasks</h3>
+                            <p>Click on a task to open the Edit Task modal. Here you can modify any details of the task, or click the "Delete" button to remove it completely. Your changes are saved automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-brand">
+                <img src="../../assets/images/favicon.svg" alt="Latest Online Tools Logo" class="footer-logo">
+                <span>LatestOnlineTools</span>
+            </div>
+            <div class="copyright">
+                <p>&copy; <span id="current-year">2023</span> Latest Online Tools. All rights reserved.</p>
+            </div>
+            <div class="contact">
+                <a href="mailto:contact@latestonlinetools.com">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification System -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/search.js"></script>
+    <script src="../../assets/js/tool-template.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
